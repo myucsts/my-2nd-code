@@ -3,6 +3,10 @@
 
 by　宮内工務店
 
+## 解説書
+
+プロジェクトの詳細な解説書を [https://myucsts.github.io/my-2nd-code/](https://myucsts.github.io/my-2nd-code/) に掲載しています。機能概要や使い方をまとめているので、あわせてご覧ください。
+
 <!-- 自己紹介セクションをグラフィカルに置き換え -->
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: linear-gradient(135deg,#f6f8ff 0%, #ffffff 100%); padding:24px; border-radius:12px; box-shadow: 0 6px 18px rgba(32,33,36,0.10); margin-top:12px;">
   <h2 style="margin:0 0 12px 0; color:#0b63ce; font-size:1.4rem;">自己紹介</h2>
