@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>my-2nd-code 掲示板ログ</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f6fb;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent: #2563eb;
+        --accent-soft: rgba(37, 99, 235, 0.1);
+        --border: rgba(15, 23, 42, 0.08);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 1.8rem 1.4rem 1.2rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+        text-align: center;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+      }
+
+      header h1 {
+        margin: 0 0 0.6rem;
+        font-size: clamp(1.35rem, 4.2vw, 2rem);
+        letter-spacing: 0.03em;
+      }
+
+      header p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      header .actions {
+        margin-top: 1.2rem;
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      header .actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        color: #2563eb;
+        background: #fff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+      }
+
+      header .actions a.secondary {
+        background: rgba(255, 255, 255, 0.16);
+        color: #fff;
+        box-shadow: none;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+      }
+
+      header .actions a:hover {
+        transform: translateY(-2px);
+      }
+
+      main {
+        padding: clamp(1rem, 2.4vw, 2rem);
+        flex: 1 1 auto;
+        width: min(980px, 100%);
+        margin: 0 auto;
+      }
+
+      #issues {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .issue-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.2rem;
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .issue-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .issue-title {
+        margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.5;
+      }
+
+      .issue-title a {
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .issue-title a:hover {
+        color: var(--accent);
+      }
+
+      .issue-meta {
+        font-size: 0.88rem;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 0.75rem;
+      }
+
+      .label-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      details {
+        border-radius: 12px;
+        border: 1px solid rgba(37, 99, 235, 0.18);
+        background: rgba(37, 99, 235, 0.04);
+        padding: 0.8rem 1rem;
+      }
+
+      details summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--accent);
+        outline: none;
+      }
+
+      details[open] summary {
+        margin-bottom: 0.6rem;
+      }
+
+      .issue-body {
+        font-size: 0.92rem;
+        color: #374151;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .loading,
+      .empty,
+      .error {
+        text-align: center;
+        padding: 2rem 1.2rem;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 16px;
+        border: 1px dashed var(--border);
+      }
+
+      footer {
+        text-align: center;
+        padding: 1.5rem 1rem 2rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      @media (min-width: 640px) {
+        #issues {
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        header {
+          padding: 1.6rem 1rem;
+        }
+
+        .issue-card {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>my-2nd-code 掲示板ログ</h1>
+      <p>
+        GitHub Issues を掲示板として利用しています。新しい投稿は GitHub
+        の Issue 画面から行ってください。
+      </p>
+      <div class="actions">
+        <a
+          href="https://github.com/myucsts/my-2nd-code/issues/new"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub Issue で新しい投稿を作成"
+          >新しい投稿を作成</a
+        >
+        <a
+          class="secondary"
+          href="https://github.com/myucsts/my-2nd-code/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub Issue 一覧を開く"
+          >GitHub Issue 一覧</a
+        >
+      </div>
+    </header>
+
+    <main>
+      <section id="issues" aria-live="polite">
+        <div class="loading">投稿を読み込んでいます…</div>
+      </section>
+    </main>
+
+    <footer>
+      GitHub API の状況により読み込みに時間がかかる場合があります。数分後にリロードしてみてください。
+    </footer>
+
+    <script>
+      (async function loadIssues() {
+        const issuesContainer = document.getElementById("issues");
+        const api =
+          "https://api.github.com/repos/myucsts/my-2nd-code/issues?state=all&per_page=50&direction=desc";
+
+        const formatDate = (isoText) => {
+          try {
+            const date = new Date(isoText);
+            return new Intl.DateTimeFormat("ja-JP", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }).format(date);
+          } catch (error) {
+            return isoText;
+          }
+        };
+
+        const createIssueCard = (issue) => {
+          const card = document.createElement("article");
+          card.className = "issue-card";
+
+          const header = document.createElement("div");
+          header.className = "issue-header";
+
+          const title = document.createElement("h2");
+          title.className = "issue-title";
+          const link = document.createElement("a");
+          link.href = issue.html_url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `#${issue.number} ${issue.title}`;
+          title.appendChild(link);
+
+          const meta = document.createElement("div");
+          meta.className = "issue-meta";
+          const state = document.createElement("span");
+          state.className = "label-badge";
+          state.textContent = issue.state === "open" ? "OPEN" : "CLOSED";
+          const user = document.createElement("span");
+          user.textContent = `投稿者: ${issue.user?.login ?? "不明"}`;
+          const created = document.createElement("span");
+          created.textContent = `作成: ${formatDate(issue.created_at)}`;
+          const updated = document.createElement("span");
+          updated.textContent = `更新: ${formatDate(issue.updated_at)}`;
+
+          meta.append(state, user, created, updated);
+
+          const labelsFragment = document.createDocumentFragment();
+          issue.labels?.forEach((label) => {
+            const pill = document.createElement("span");
+            pill.className = "label-badge";
+
+            if (label.color) {
+              pill.style.color = "#fff";
+              pill.style.backgroundColor = `#${label.color}`;
+            }
+
+            pill.textContent = label.name ?? "label";
+            labelsFragment.appendChild(pill);
+          });
+
+          const labelsContainer = document.createElement("div");
+          labelsContainer.appendChild(labelsFragment);
+          labelsContainer.style.display = labelsFragment.childNodes.length
+            ? "flex"
+            : "none";
+          labelsContainer.style.flexWrap = "wrap";
+          labelsContainer.style.gap = "0.4rem";
+
+          header.append(title, meta);
+          card.appendChild(header);
+          if (labelsFragment.childNodes.length) {
+            card.appendChild(labelsContainer);
+          }
+
+          if (issue.body) {
+            const details = document.createElement("details");
+            const summary = document.createElement("summary");
+            summary.textContent = "本文を開く";
+            const bodyEl = document.createElement("div");
+            bodyEl.className = "issue-body";
+            bodyEl.textContent = issue.body;
+            details.append(summary, bodyEl);
+            card.appendChild(details);
+          }
+
+          return card;
+        };
+
+        try {
+          const response = await fetch(api, {
+            headers: {
+              Accept: "application/vnd.github+json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `GitHub API からの取得に失敗しました (status: ${response.status})`
+            );
+          }
+
+          const payload = await response.json();
+          const issues = payload.filter((entry) => !entry.pull_request);
+
+          issuesContainer.innerHTML = "";
+
+          if (!issues.length) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "まだ投稿がありません。GitHub Issue から投稿してください。";
+            issuesContainer.appendChild(empty);
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          issues.forEach((issue) => fragment.appendChild(createIssueCard(issue)));
+          issuesContainer.appendChild(fragment);
+        } catch (error) {
+          console.error(error);
+          issuesContainer.innerHTML = "";
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "error";
+          errorMessage.innerHTML =
+            "投稿の取得に失敗しました。しばらくしてから再読み込みしてください。<br />" +
+            (error instanceof Error ? error.message : "");
+          issuesContainer.appendChild(errorMessage);
+        }
+      })();
+    </script>
+  </body>
+</html>
