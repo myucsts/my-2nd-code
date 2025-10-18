@@ -5,7 +5,13 @@ by　宮内工務店
 
 ## 解説書
 
-プロジェクトの詳細な解説書を [https://myucsts.github.io/my-2nd-code/](https://myucsts.github.io/my-2nd-code/) に掲載しています。機能概要や使い方をまとめているので、あわせてご覧ください。
+[https://myucsts.github.io/my-2nd-code/](https://myucsts.github.io/my-2nd-code/) にて、以下の内容をまとめた解説書を公開しています。
+- プロジェクトの背景と狙い
+- セットアップ手順と必要なツール
+- 主要機能の使い方とサンプル
+- トラブルシューティングと FAQ
+
+初めて利用される際は、README と合わせて解説書をご確認ください。
 
 <!-- 自己紹介セクションをグラフィカルに置き換え -->
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: linear-gradient(135deg,#f6f8ff 0%, #ffffff 100%); padding:24px; border-radius:12px; box-shadow: 0 6px 18px rgba(32,33,36,0.10); margin-top:12px;">
