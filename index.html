@@ -6,14 +6,18 @@
     <title>my-2nd-code 掲示板ログ</title>
     <style>
       :root {
-        color-scheme: light;
-        --bg: #f4f6fb;
-        --card-bg: #ffffff;
-        --text: #1f2937;
-        --muted: #6b7280;
-        --accent: #2563eb;
-        --accent-soft: rgba(37, 99, 235, 0.1);
-        --border: rgba(15, 23, 42, 0.08);
+        color-scheme: dark;
+        --bg: radial-gradient(circle at 10% 15%, rgba(255, 153, 0, 0.08), transparent 42%),
+          radial-gradient(circle at 88% 5%, rgba(147, 51, 234, 0.12), transparent 48%),
+          linear-gradient(180deg, #150b23 0%, #090313 100%);
+        --card-bg: rgba(40, 22, 60, 0.78);
+        --card-glow: rgba(249, 115, 22, 0.18);
+        --text: #fdf1ff;
+        --muted: #d0b4ff;
+        --accent: #f97316;
+        --accent-secondary: #8b5cf6;
+        --accent-soft: rgba(249, 115, 22, 0.15);
+        --border: rgba(252, 252, 255, 0.14);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
       }
@@ -29,27 +33,69 @@
         color: var(--text);
         display: flex;
         flex-direction: column;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        mix-blend-mode: screen;
+        z-index: -1;
+      }
+
+      body::before {
+        background:
+          radial-gradient(circle at 15% 70%, rgba(139, 92, 246, 0.22), transparent 58%),
+          radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.28), transparent 62%);
+        opacity: 0.9;
+      }
+
+      body::after {
+        background-image: url("data:image/svg+xml,%3Csvg width='140' height='140' viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f97316' fill-opacity='0.12'%3E%3Cpath d='M20 10c3 6 7 10 15 10s12-4 15-10c-3-6-7-10-15-10S23 4 20 10zM100 60c3 6 7 10 15 10s12-4 15-10c-3-6-7-10-15-10s-12 4-15 10z'/%3E%3C/g%3E%3Cg fill='%238b5cf6' fill-opacity='0.1'%3E%3Ccircle cx='40' cy='110' r='6'/%3E%3Ccircle cx='120' cy='30' r='6'/%3E%3C/g%3E%3C/svg%3E");
+        background-size: 160px;
+        opacity: 0.55;
       }
 
       header {
         padding: 1.8rem 1.4rem 1.2rem;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.92), rgba(76, 29, 149, 0.95));
         color: #fff;
         text-align: center;
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      header::after {
+        content: "";
+        position: absolute;
+        inset: -60% -20% auto -20%;
+        height: 260px;
+        background:
+          radial-gradient(circle at 15% 40%, rgba(255, 255, 255, 0.18), transparent 55%),
+          radial-gradient(circle at 85% 70%, rgba(249, 115, 22, 0.25), transparent 60%);
+        transform: rotate(-8deg);
+        opacity: 0.8;
       }
 
       header h1 {
         margin: 0 0 0.6rem;
-        font-size: clamp(1.35rem, 4.2vw, 2rem);
-        letter-spacing: 0.03em;
+        font-size: clamp(1.45rem, 4.6vw, 2.3rem);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-shadow: 0 4px 14px rgba(44, 0, 66, 0.45);
       }
 
       header p {
         margin: 0;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.92);
       }
 
       header .actions {
@@ -70,22 +116,24 @@
         font-weight: 600;
         font-size: 0.95rem;
         text-decoration: none;
-        color: #2563eb;
-        background: #fff;
+        color: #160c24;
+        background: rgba(255, 241, 186, 0.92);
         transition: transform 0.2s ease, box-shadow 0.2s ease,
-          background 0.2s ease;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+          background 0.2s ease, color 0.2s ease;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
       }
 
       header .actions a.secondary {
-        background: rgba(255, 255, 255, 0.16);
+        background: rgba(26, 5, 44, 0.35);
         color: #fff;
         box-shadow: none;
-        border: 1px solid rgba(255, 255, 255, 0.24);
+        border: 1px solid rgba(255, 255, 255, 0.32);
       }
 
       header .actions a:hover {
         transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.96);
+        color: #5b21b6;
       }
 
       main {
@@ -93,6 +141,21 @@
         flex: 1 1 auto;
         width: min(980px, 100%);
         margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      main::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        max-width: 85%;
+        height: 60%;
+        background: radial-gradient(circle at center, rgba(249, 115, 22, 0.18), transparent 70%);
+        filter: blur(60px);
+        opacity: 0.9;
+        z-index: -1;
       }
 
       #issues {
@@ -103,12 +166,13 @@
       .issue-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
-        border-radius: 16px;
+        border-radius: 20px;
         padding: 1.2rem;
-        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 22px 42px rgba(8, 4, 20, 0.45), 0 0 24px var(--card-glow);
         display: flex;
         flex-direction: column;
         gap: 0.8rem;
+        backdrop-filter: blur(12px);
       }
 
       .issue-header {
@@ -126,6 +190,7 @@
       .issue-title a {
         color: var(--text);
         text-decoration: none;
+        text-shadow: 0 2px 6px rgba(7, 0, 14, 0.45);
       }
 
       .issue-title a:hover {
@@ -152,13 +217,30 @@
         letter-spacing: 0.05em;
         background: var(--accent-soft);
         color: var(--accent);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 18px rgba(249, 115, 22, 0.32);
+      }
+
+      .label-badge.is-open {
+        background: rgba(34, 197, 94, 0.22);
+        color: #bbf7d0;
+        border-color: rgba(16, 185, 129, 0.32);
+        box-shadow: 0 8px 18px rgba(34, 197, 94, 0.24);
+      }
+
+      .label-badge.is-closed {
+        background: rgba(244, 63, 94, 0.22);
+        color: #fecdd3;
+        border-color: rgba(244, 63, 94, 0.32);
+        box-shadow: 0 8px 18px rgba(244, 63, 94, 0.26);
       }
 
       details {
         border-radius: 12px;
-        border: 1px solid rgba(37, 99, 235, 0.18);
-        background: rgba(37, 99, 235, 0.04);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        background: rgba(22, 8, 36, 0.55);
         padding: 0.8rem 1rem;
+        backdrop-filter: blur(8px);
       }
 
       details summary {
@@ -166,6 +248,7 @@
         font-weight: 600;
         color: var(--accent);
         outline: none;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
       }
 
       details[open] summary {
@@ -174,7 +257,7 @@
 
       .issue-body {
         font-size: 0.92rem;
-        color: #374151;
+        color: #f3e8ff;
         line-height: 1.6;
         white-space: pre-wrap;
         word-break: break-word;
@@ -186,16 +269,21 @@
         text-align: center;
         padding: 2rem 1.2rem;
         color: var(--muted);
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(18, 6, 32, 0.72);
         border-radius: 16px;
         border: 1px dashed var(--border);
+        box-shadow: 0 12px 28px rgba(5, 2, 14, 0.4);
+        backdrop-filter: blur(10px);
       }
 
       footer {
         text-align: center;
         padding: 1.5rem 1rem 2rem;
-        font-size: 0.85rem;
+        font-size: 0.88rem;
         color: var(--muted);
+        background: rgba(12, 4, 24, 0.82);
+        border-top: 1px solid var(--border);
+        backdrop-filter: blur(12px);
       }
 
       footer a {
@@ -222,10 +310,9 @@
   </head>
   <body>
     <header>
-      <h1>my-2nd-code 掲示板ログ</h1>
+      <h1>🎃 my-2nd-code ハロウィン掲示板 🎃</h1>
       <p>
-        GitHub Issues を掲示板として利用しています。新しい投稿は GitHub
-        の Issue 画面から行ってください。
+        GitHub Issues をカラフルなハロウィン掲示板として活用しています。キャンディを交換する気分で、仮装ネタや近況を気軽に投稿してください。
       </p>
       <div class="actions">
         <a
@@ -297,7 +384,9 @@
           meta.className = "issue-meta";
           const state = document.createElement("span");
           state.className = "label-badge";
-          state.textContent = issue.state === "open" ? "OPEN" : "CLOSED";
+          const isOpen = issue.state === "open";
+          state.classList.add(isOpen ? "is-open" : "is-closed");
+          state.textContent = isOpen ? "OPEN" : "CLOSED";
           const user = document.createElement("span");
           user.textContent = `投稿者: ${issue.user?.login ?? "不明"}`;
           const created = document.createElement("span");
