@@ -263,6 +263,43 @@
         word-break: break-word;
       }
 
+      .issue-body a.issue-link {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-color: rgba(249, 115, 22, 0.5);
+        word-break: break-all;
+      }
+
+      .issue-body a.issue-link:hover {
+        color: #fb923c;
+      }
+
+      .issue-body figure.issue-image {
+        margin: 0.9rem 0;
+        padding: 0.75rem;
+        background: rgba(12, 4, 24, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        box-shadow: 0 18px 32px rgba(8, 4, 20, 0.45);
+      }
+
+      .issue-body figure.issue-image img {
+        max-width: min(520px, 100%);
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 12px 28px rgba(8, 4, 20, 0.6);
+      }
+
+      .issue-body figure.issue-image figcaption {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.82);
+        text-align: center;
+      }
+
       .loading,
       .empty,
       .error {
@@ -349,6 +386,138 @@
         const api =
           "https://api.github.com/repos/myucsts/my-2nd-code/issues?state=all&per_page=50&direction=desc";
 
+        const escapeHtml = (unsafe = "") =>
+          unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+
+        const normalizeUrl = (rawUrl) => {
+          try {
+            const parsed = new URL(rawUrl);
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+              return null;
+            }
+            return parsed.href;
+          } catch (_error) {
+            return null;
+          }
+        };
+
+        const absoluteUrlPattern = /(https?:\/\/[^\s<]+)/g;
+        const inlineImagePattern =
+          /(https?:\/\/[^\s<]+?\.(?:png|jpe?g|gif|webp|svg))/gi;
+
+        const buildImageFigure = (altText = "", rawUrl) => {
+          const safeHref = normalizeUrl(rawUrl);
+          if (!safeHref) {
+            return escapeHtml(`![${altText}](${rawUrl})`);
+          }
+
+          const safeSrc = safeHref.replace(/"/g, "%22");
+          const safeAlt = escapeHtml(altText);
+          const caption =
+            altText && altText.trim().length
+              ? `<figcaption>${safeAlt}</figcaption>`
+              : "";
+
+          return `<figure class="issue-image"><img src="${safeSrc}" alt="${safeAlt}" loading="lazy" decoding="async" />${caption}</figure>`;
+        };
+
+        const linkifyText = (segment) => {
+          const escaped = escapeHtml(segment);
+          const withBreaks = escaped.replace(/\r?\n/g, "<br />");
+          absoluteUrlPattern.lastIndex = 0;
+          return withBreaks.replace(
+            absoluteUrlPattern,
+            (url) =>
+              `<a class="issue-link" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+          );
+        };
+
+        const renderIssueBody = (body = "") => {
+          if (!body) {
+            return "";
+          }
+
+          const markdownImagePattern =
+            /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
+
+          const segments = [];
+          let lastIndex = 0;
+          markdownImagePattern.lastIndex = 0;
+          body.replace(
+            markdownImagePattern,
+            (match, alt, url, offset) => {
+              if (offset > lastIndex) {
+                segments.push({
+                  type: "text",
+                  content: body.slice(lastIndex, offset),
+                });
+              }
+
+              segments.push({ type: "image", alt, url });
+              lastIndex = offset + match.length;
+              return match;
+            }
+          );
+
+          if (lastIndex < body.length) {
+            segments.push({ type: "text", content: body.slice(lastIndex) });
+          }
+
+          const htmlParts = [];
+
+          const processTextSegment = (textSegment) => {
+            if (!textSegment) {
+              return;
+            }
+
+            const subParts = [];
+            let cursor = 0;
+            inlineImagePattern.lastIndex = 0;
+            let imageMatch;
+            while ((imageMatch = inlineImagePattern.exec(textSegment))) {
+              if (imageMatch.index > cursor) {
+                subParts.push({
+                  type: "text",
+                  content: textSegment.slice(cursor, imageMatch.index),
+                });
+              }
+
+              subParts.push({ type: "image", alt: "", url: imageMatch[0] });
+              cursor = imageMatch.index + imageMatch[0].length;
+            }
+
+            if (cursor < textSegment.length) {
+              subParts.push({
+                type: "text",
+                content: textSegment.slice(cursor),
+              });
+            }
+
+            subParts.forEach((part) => {
+              if (part.type === "image") {
+                htmlParts.push(buildImageFigure(part.alt, part.url));
+              } else {
+                htmlParts.push(linkifyText(part.content));
+              }
+            });
+          };
+
+          segments.forEach((segment) => {
+            if (segment.type === "image") {
+              htmlParts.push(buildImageFigure(segment.alt, segment.url));
+            } else {
+              processTextSegment(segment.content);
+            }
+          });
+
+          return htmlParts.join("");
+        };
+
         const formatDate = (isoText) => {
           try {
             const date = new Date(isoText);
@@ -430,7 +599,7 @@
             summary.textContent = "本文を開く";
             const bodyEl = document.createElement("div");
             bodyEl.className = "issue-body";
-            bodyEl.textContent = issue.body;
+            bodyEl.innerHTML = renderIssueBody(issue.body);
             details.append(summary, bodyEl);
             card.appendChild(details);
           }
